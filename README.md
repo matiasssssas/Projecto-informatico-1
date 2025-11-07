@@ -1,1 +1,1 @@
-# Projecto-informatico-1
+# empezando armar el esquema 
