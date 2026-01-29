@@ -1,1 +1,0 @@
-# Projecto-informatico-1

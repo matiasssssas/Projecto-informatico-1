@@ -1,0 +1,68 @@
+#define LDR     A0
+#define BOTON   2
+#define LED_R   9
+#define LED_G   10
+#define LED_B   11
+#define BUZZER  8
+
+bool alarma = false;
+
+void setup() {
+  pinMode(BOTON, INPUT_PULLUP);
+  pinMode(LED_R, OUTPUT);
+  pinMode(LED_G, OUTPUT);
+  pinMode(LED_B, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
+
+  Serial.begin(9600); // inicia el monitor serial
+}
+
+void loop() {
+  if (digitalRead(BOTON) == LOW) {
+    alarma = !alarma;
+    delay(300);
+  }
+
+  int valor = analogRead(LDR);
+  int luz = map(valor, 0, 1023, 0, 100);
+
+  // Apagar todo
+  analogWrite(LED_R, 0);
+  analogWrite(LED_G, 0);
+  analogWrite(LED_B, 0);
+  digitalWrite(BUZZER, LOW);
+
+  // monitor serial
+  Serial.print("Luz: ");
+  Serial.print(luz);
+  Serial.print("%  |  Alarma: ");
+  if (alarma) {
+    Serial.println("ON");
+  } else {
+    Serial.println("OFF");
+  }
+
+  // condiciones del buzzer y del led rgb
+  if (luz > 70 && !alarma) {
+    analogWrite(LED_G, 255);              // Verde
+  }
+  else if (luz > 70 && alarma) {
+    analogWrite(LED_G, 255);              // Cyan
+    analogWrite(LED_B, 255);
+  }
+  else if (luz >= 30 && luz <= 70 && !alarma) {
+    analogWrite(LED_R, 180);              // Violeta
+    analogWrite(LED_B, 255);
+  }
+  else if (luz >= 30 && luz <= 70 && alarma) {
+    analogWrite(LED_R, 255);              // Naranja
+    analogWrite(LED_G, 100);
+    analogWrite(LED_B, 0);
+  }
+  else if (luz < 30 && alarma) {
+    analogWrite(LED_R, 255);              // Rojo
+    digitalWrite(BUZZER, HIGH);
+  }
+
+  delay(500); // no saturar 
+}
